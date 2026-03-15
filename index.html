@@ -1,0 +1,671 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>AIチャットアプリ</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#000000">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="AI Soul">
+    <link rel="apple-touch-icon" href="icon.png">
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+</head>
+<body>
+    <div class="app-container rabi-theme" id="app">
+        <!-- サイドバー -->
+        <aside class="sidebar" id="sidebar">
+            <div class="sidebar-header">
+                <h3>チャットセッション</h3>
+                <button class="new-session-btn" id="newSessionBtn">+</button>
+            </div>
+            <ul class="session-list" id="sessionList">
+                <!-- 動的に生成されます -->
+            </ul>
+            <div class="sidebar-footer">
+                <button class="settings-btn" id="openSettingsModal">⚙ 設定</button>
+            </div>
+        </aside>
+        <div class="overlay" id="overlay"></div>
+
+        <!-- 魂格納庫（プロンプト設定）モーダル -->
+        <div class="modal" id="soulModal">
+            <div class="modal-content soul-modal-content">
+                <div class="modal-header">
+                    <h2>魂格納庫</h2>
+                    <button class="close-btn" id="closeSoulModal">×</button>
+                </div>
+                <div class="soul-tabs">
+                    <button class="soul-tab-btn active" data-char="rabiBtn">ラビ</button>
+                    <button class="soul-tab-btn" data-char="shuBtn">シュウくん</button>
+                    <button class="soul-tab-btn" data-char="hikaruBtn">光くん</button>
+                </div>
+                <div class="modal-body">
+                    <div class="prompt-field">
+                        <label id="soulCharName">ラビの魂</label>
+                        <textarea id="characterPrompt" placeholder="性格や口調を設定してください..."></textarea>
+                    </div>
+                    <button class="save-all-btn" id="savePrompt">魂を刻む</button>
+                    <!-- フッター：戻る -->
+                    <div class="settings-footer" style="margin-top: 20px;">
+                        <button class="settings-back-btn" id="footerCloseSoul">チャットに戻る</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 統合設定モーダル -->
+        <div class="modal" id="settingsModal">
+            <div class="modal-content settings-modal-content">
+                <div class="modal-header">
+                    <h2>⚙ アプリ設定</h2>
+                    <button class="close-btn" id="closeSettingsModal">×</button>
+                </div>
+                <div class="modal-body">
+                    <!-- セクション：パーソナリティ -->
+                    <div class="settings-section">
+                        <div class="settings-section-title">魂の管理</div>
+                        <button class="settings-action-btn" id="settingsOpenSoul">魂格納庫を開く...</button>
+                    </div>
+
+                    <!-- セクション：API -->
+                    <div class="settings-section">
+                        <div class="settings-section-title">APIキー設定</div>
+                        <div class="api-field">
+                            <label>ラビ</label>
+                            <input type="text" id="setApiKeyRabi" placeholder="APIキーを入力...">
+                        </div>
+                        <div class="api-field">
+                            <label>シュウくん</label>
+                            <input type="text" id="setApiKeyShu" placeholder="APIキーを入力...">
+                        </div>
+                        <div class="api-field">
+                            <label>光くん</label>
+                            <input type="text" id="setApiKeyHikaru" placeholder="APIキーを入力...">
+                        </div>
+                        <button class="settings-save-btn" id="setSaveAllKeys">APIキーを保存</button>
+                    </div>
+
+                    <!-- セクション：外観 -->
+                    <div class="settings-section">
+                        <div class="settings-section-title">背景デザイン</div>
+                        <button class="settings-action-btn" onclick="document.getElementById('bgInput').click()">背景画像を選択...</button>
+                        <input type="file" id="bgInput" accept="image/*" style="display: none">
+                    </div>
+
+                    <!-- セクション：データ -->
+                    <div class="settings-section">
+                        <div class="settings-section-title">データ管理</div>
+                        <div class="settings-btn-group">
+                            <button class="settings-action-btn half" id="setExportBtn">エクスポート</button>
+                            <button class="settings-action-btn half" id="setImportBtn">データを復元</button>
+                        </div>
+                        <input type="file" id="importInput" accept=".json" style="display: none">
+                        <p class="settings-note">※エクスポートしたファイルを読み込むことで、魂や履歴を復元できます。</p>
+                    </div>
+
+                    <!-- フッター：戻る -->
+                    <div class="settings-footer" style="margin-top: 10px;">
+                        <button class="settings-back-btn" id="footerCloseSettings">チャットに戻る</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="top-bar">
+            <div class="top-left-btns">
+                <button class="menu-btn" id="menuBtn">☰</button>
+                <button class="top-new-session-btn" id="topNewSessionBtn">+</button>
+            </div>
+            <div class="session-title-container">
+                <div class="session-title" contenteditable="true">新しいチャット</div>
+            </div>
+            <nav class="character-selector">
+                <button class="char-btn active" id="rabiBtn"></button>
+                <button class="char-btn" id="shuBtn"></button>
+                <button class="char-btn" id="hikaruBtn"></button>
+            </nav>
+        </div>
+
+        <main class="chat-display" id="chatDisplay">
+            <!-- メッセージがここに追加されます -->
+        </main>
+
+        <footer class="input-area">
+            <textarea id="userInput" placeholder="メッセージを入力..." autocomplete="off"></textarea>
+            <button id="sendBtn">↑</button>
+        </footer>
+    </div>
+
+    <script>
+        const sendBtn = document.getElementById('sendBtn');
+        const userInput = document.getElementById('userInput');
+        const chatDisplay = document.getElementById('chatDisplay');
+        const sessionTitle = document.querySelector('.session-title');
+        const app = document.getElementById('app');
+        const charBtns = document.querySelectorAll('.char-btn');
+        const sidebar = document.getElementById('sidebar');
+        const overlay = document.getElementById('overlay');
+        const menuBtn = document.getElementById('menuBtn');
+        const bgInput = document.getElementById('bgInput');
+
+        // データ管理用
+        let sessions = JSON.parse(localStorage.getItem('chat_sessions')) || [];
+        let currentSessionId = localStorage.getItem('current_session_id');
+        let currentCharacter = 'rabiBtn';
+
+        const themes = {
+            'rabiBtn': 'rabi-theme',
+            'shuBtn': 'shu-theme',
+            'hikaruBtn': 'hikaru-theme'
+        };
+
+        // メッセージを表示・保存する共通関数
+        const appendMessage = (text, type, save = true) => {
+            const msgDiv = document.createElement('div');
+            msgDiv.className = `message ${type}`;
+            
+            let contentHtml = '';
+            if (type === 'ai') {
+                // AIの返答のみマークダウンとしてパース
+                contentHtml = marked.parse(text);
+            } else if (type === 'user') {
+                contentHtml = `<p>${text}</p><button class="edit-msg-btn" onclick="editMessage(this)">✎</button>`;
+            } else {
+                contentHtml = `<p>${text}</p>`;
+            }
+            
+            msgDiv.innerHTML = contentHtml;
+            chatDisplay.appendChild(msgDiv);
+            chatDisplay.scrollTop = chatDisplay.scrollHeight;
+
+            if (save && currentSessionId) {
+                const messages = JSON.parse(localStorage.getItem(`msgs_${currentSessionId}`)) || [];
+                messages.push({ text, type, timestamp: Date.now() });
+                localStorage.setItem(`msgs_${currentSessionId}`, JSON.stringify(messages));
+                
+                // セッションの最終更新日時とタイトルを更新
+                const session = sessions.find(s => s.id === currentSessionId);
+                if (session) {
+                    session.lastUpdated = Date.now();
+                    saveSessions();
+                    renderSessionList();
+                }
+            }
+            return msgDiv;
+        };
+
+        const saveSessions = () => {
+            localStorage.setItem('chat_sessions', JSON.stringify(sessions));
+        };
+
+        const loadSession = (sessionId) => {
+            if (!sessionId) return;
+            currentSessionId = sessionId;
+            localStorage.setItem('current_session_id', sessionId);
+            
+            const session = sessions.find(s => s.id === sessionId);
+            if (session) {
+                sessionTitle.innerText = session.title;
+                // キャラクターをそのセッションのものに変える
+                if (session.character !== currentCharacter) {
+                    switchCharacterUI(session.character);
+                }
+            }
+
+            chatDisplay.innerHTML = '';
+            const messages = JSON.parse(localStorage.getItem(`msgs_${sessionId}`)) || [];
+            messages.forEach(m => appendMessage(m.text, m.type, false));
+            updateBackground();
+            renderSessionList();
+        };
+
+        const createNewSession = (charId) => {
+            const newId = 'session_' + Date.now();
+            const newSession = {
+                id: newId,
+                title: '新しいチャット',
+                character: charId || currentCharacter,
+                lastUpdated: Date.now()
+            };
+            sessions.unshift(newSession);
+            saveSessions();
+            loadSession(newId);
+        };
+
+        const renderSessionList = () => {
+            const list = document.getElementById('sessionList');
+            list.innerHTML = '';
+            sessions.forEach(s => {
+                const li = document.createElement('li');
+                li.className = `session-item ${s.id === currentSessionId ? 'active' : ''} ${getCharClass(s.character)}`;
+                li.innerHTML = `
+                    <span class="dot"></span>
+                    <span class="session-name">${s.title}</span>
+                    <button class="delete-session-btn" onclick="deleteSession('${s.id}', event)">☒</button>
+                `;
+                li.onclick = () => {
+                    loadSession(s.id);
+                    sidebar.classList.remove('open');
+                    overlay.classList.remove('visible');
+                };
+                list.appendChild(li);
+            });
+        };
+
+        window.deleteSession = (sessionId, event) => {
+            event.stopPropagation();
+            if (confirm('本当に消す？')) {
+                // データを削除
+                sessions = sessions.filter(s => s.id !== sessionId);
+                saveSessions();
+                localStorage.removeItem(`msgs_${sessionId}`);
+                
+                // 削除したものが現在のセッションなら切り替え
+                if (sessionId === currentSessionId) {
+                    if (sessions.length > 0) {
+                        loadSession(sessions[0].id);
+                    } else {
+                        currentSessionId = null;
+                        chatDisplay.innerHTML = '';
+                        sessionTitle.innerText = '新しいチャット';
+                        createNewSession(currentCharacter);
+                    }
+                } else {
+                    renderSessionList();
+                }
+            }
+        };
+
+        const getCharClass = (id) => {
+            if (id === 'rabiBtn') return 'rabi';
+            if (id === 'shuBtn') return 'shu';
+            if (id === 'hikaruBtn') return 'hikaru';
+            return '';
+        };
+
+        const switchCharacterUI = (id) => {
+            charBtns.forEach(b => b.classList.remove('active'));
+            const targetBtn = document.getElementById(id);
+            if (targetBtn) targetBtn.classList.add('active');
+            
+            currentCharacter = id;
+            Object.values(themes).forEach(t => app.classList.remove(t));
+            app.classList.add(themes[id]);
+        };
+
+        sendBtn.addEventListener('click', async () => {
+            const text = userInput.value.trim();
+            if (!text) return;
+
+            if (!currentSessionId) {
+                createNewSession(currentCharacter);
+            }
+
+            appendMessage(text, 'user');
+            userInput.value = '';
+            userInput.style.height = '28px'; // 高さをリセット
+            userInput.style.overflowY = 'hidden';
+
+            const apiKey = localStorage.getItem(`gemini_api_key_${currentCharacter}`);
+            if (!apiKey) {
+                appendMessage(`${getCharacterName(currentCharacter)}のAPIキーが設定されていません。`, 'system');
+                return;
+            }
+
+            const loadingMsg = appendMessage('...', 'ai-loading', false);
+
+            try {
+                const systemPrompt = localStorage.getItem(`character_prompt_${currentCharacter}`) || '';
+                const response = await callGemini(text, apiKey, systemPrompt);
+                loadingMsg.remove();
+                appendMessage(response, 'ai');
+
+                // タイトルの自動生成（初回のみ）
+                const session = sessions.find(s => s.id === currentSessionId);
+                if (session && session.title === '新しいチャット') {
+                    generateChatTitle(text, response, apiKey).then(newTitle => {
+                        if (newTitle) {
+                            session.title = newTitle;
+                            if (currentSessionId === session.id) {
+                                sessionTitle.innerText = newTitle;
+                            }
+                            saveSessions();
+                            renderSessionList();
+                        }
+                    });
+                }
+            } catch (error) {
+                loadingMsg.remove();
+                appendMessage('通信エラーが発生しました。', 'system');
+                console.error(error);
+            }
+        });
+
+        const generateChatTitle = async (userText, aiText, apiKey) => {
+            try {
+                const prompt = `以下の会話のタイトルを、15文字以内の日本語で1つだけ出力してください。装飾や説明は不要です。タイトルのみを出力してください。\n\nユーザー: ${userText}\nAI: ${aiText.substring(0, 100)}`;
+                const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-3.1-flash-lite-preview:generateContent?key=${apiKey}`;
+                const body = {
+                    contents: [{ parts: [{ text: prompt }] }]
+                };
+                const response = await fetch(url, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(body)
+                });
+                const data = await response.json();
+                if (data.candidates && data.candidates[0].content && data.candidates[0].content.parts[0].text) {
+                    return data.candidates[0].content.parts[0].text.replace(/["'「」]/g, '').trim();
+                }
+            } catch (e) {
+                console.error('Title generation failed:', e);
+            }
+            return userText.substring(0, 15);
+        };
+
+        const getCharacterName = (id) => {
+            if (id === 'rabiBtn') return 'ラビ';
+            if (id === 'shuBtn') return 'シュウくん';
+            if (id === 'hikaruBtn') return '光くん';
+            return 'AI';
+        };
+
+        const callGemini = async (prompt, apiKey, systemPrompt = '') => {
+            const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-3.1-flash-lite-preview:generateContent?key=${apiKey}`;
+            const body = {
+                contents: [{ parts: [{ text: prompt }] }]
+            };
+            
+            if (systemPrompt) {
+                body.system_instruction = {
+                    parts: [{ text: systemPrompt }]
+                };
+            }
+
+            const response = await fetch(url, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(body)
+            });
+            const data = await response.json();
+            if (data.candidates && data.candidates[0].content && data.candidates[0].content.parts[0].text) {
+                return data.candidates[0].content.parts[0].text;
+            } else {
+                throw new Error('Invalid API response');
+            }
+        };
+
+        // 設定モーダル管理
+        const settingsModal = document.getElementById('settingsModal');
+        const openSettingsModal = document.getElementById('openSettingsModal');
+        const closeSettingsModal = document.getElementById('closeSettingsModal');
+        const settingsOpenSoul = document.getElementById('settingsOpenSoul');
+        const setSaveAllKeysBtn = document.getElementById('setSaveAllKeys');
+        const setApiInputs = {
+            'rabiBtn': document.getElementById('setApiKeyRabi'),
+            'shuBtn': document.getElementById('setApiKeyShu'),
+            'hikaruBtn': document.getElementById('setApiKeyHikaru')
+        };
+
+        openSettingsModal.onclick = () => {
+            Object.keys(setApiInputs).forEach(id => {
+                setApiInputs[id].value = localStorage.getItem(`gemini_api_key_${id}`) || '';
+            });
+            settingsModal.classList.add('visible');
+            sidebar.classList.remove('open');
+            overlay.classList.remove('visible');
+        };
+
+        closeSettingsModal.onclick = () => settingsModal.classList.remove('visible');
+        document.getElementById('footerCloseSettings').onclick = () => settingsModal.classList.remove('visible');
+
+        settingsOpenSoul.onclick = () => {
+            settingsModal.classList.remove('visible');
+            openSoulModalFn();
+        };
+
+        setSaveAllKeysBtn.onclick = () => {
+            Object.keys(setApiInputs).forEach(id => {
+                localStorage.setItem(`gemini_api_key_${id}`, setApiInputs[id].value.trim());
+            });
+            alert('APIキーを保存しました');
+        };
+
+        // 魂格納庫（プロンプト設定）管理
+        const soulModal = document.getElementById('soulModal');
+        const closeSoulModal = document.getElementById('closeSoulModal');
+        const savePromptBtn = document.getElementById('savePrompt');
+        const soulTabBtns = document.querySelectorAll('.soul-tab-btn');
+        const soulPromptArea = document.getElementById('characterPrompt');
+        const soulCharLabel = document.getElementById('soulCharName');
+        let soulActiveChar = 'rabiBtn';
+
+        const openSoulModalFn = () => {
+            soulActiveChar = currentCharacter;
+            updateSoulModalState();
+            soulModal.classList.add('visible');
+            sidebar.classList.remove('open');
+            overlay.classList.remove('visible');
+        };
+
+        closeSoulModal.addEventListener('click', () => soulModal.classList.remove('visible'));
+        document.getElementById('footerCloseSoul').onclick = () => soulModal.classList.remove('visible');
+
+        soulTabBtns.forEach(btn => {
+            btn.addEventListener('click', () => {
+                soulActiveChar = btn.dataset.char;
+                updateSoulModalState();
+            });
+        });
+
+        const updateSoulModalState = () => {
+            soulTabBtns.forEach(b => b.classList.toggle('active', b.dataset.char === soulActiveChar));
+            soulCharLabel.innerText = `${getCharacterName(soulActiveChar)}の魂`;
+            soulPromptArea.value = localStorage.getItem(`character_prompt_${soulActiveChar}`) || '';
+        };
+
+        savePromptBtn.addEventListener('click', () => {
+            localStorage.setItem(`character_prompt_${soulActiveChar}`, soulPromptArea.value.trim());
+            alert(`${getCharacterName(soulActiveChar)}の魂を刻みました`);
+        });
+
+        // サイドバー
+        menuBtn.addEventListener('click', () => {
+            sidebar.classList.add('open');
+            overlay.classList.add('visible');
+        });
+
+        overlay.addEventListener('click', () => {
+            sidebar.classList.remove('open');
+            overlay.classList.remove('visible');
+        });
+
+        // 背景
+        const updateBackground = () => {
+            const savedBg = localStorage.getItem(`bg_${currentCharacter}`);
+            if (savedBg) {
+                chatDisplay.style.backgroundImage = `url(${savedBg})`;
+                chatDisplay.classList.add('has-bg');
+            } else {
+                chatDisplay.style.backgroundImage = 'none';
+                chatDisplay.classList.remove('has-bg');
+            }
+        };
+
+        bgInput.addEventListener('change', (e) => {
+            const file = e.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = (event) => {
+                    localStorage.setItem(`bg_${currentCharacter}`, event.target.result);
+                    updateBackground();
+                };
+                reader.readAsDataURL(file);
+            }
+        });
+
+        // キャラクター切り替え
+        charBtns.forEach(btn => {
+            btn.addEventListener('click', () => {
+                const lastSession = sessions.find(s => s.character === btn.id);
+                if (lastSession) {
+                    loadSession(lastSession.id);
+                } else {
+                    switchCharacterUI(btn.id);
+                    createNewSession(btn.id);
+                }
+            });
+        });
+
+        document.getElementById('newSessionBtn').onclick = () => {
+            createNewSession(currentCharacter);
+            sidebar.classList.remove('open');
+            overlay.classList.remove('visible');
+        }
+
+        document.getElementById('topNewSessionBtn').onclick = () => {
+            createNewSession(currentCharacter);
+        }
+
+        // メッセージの編集
+        window.editMessage = (btn) => {
+            const msgDiv = btn.parentElement;
+            const messages = JSON.parse(localStorage.getItem(`msgs_${currentSessionId}`)) || [];
+            
+            // 全てのメッセージノードを取得してインデックスを特定
+            const allMsgDivs = Array.from(chatDisplay.querySelectorAll('.message'));
+            const index = allMsgDivs.indexOf(msgDiv);
+            
+            if (index !== -1 && messages[index]) {
+                const text = messages[index].text;
+                // 入力欄に値を戻す
+                userInput.value = text;
+                userInput.focus();
+                // 高さを自動調整
+                userInput.style.height = 'auto';
+                userInput.style.height = userInput.scrollHeight + 'px';
+                
+                // データから削除（これ以降をすべて消す）
+                const truncatedMessages = messages.slice(0, index);
+                localStorage.setItem(`msgs_${currentSessionId}`, JSON.stringify(truncatedMessages));
+                
+                // 画面から削除
+                while (chatDisplay.childNodes.length > index) {
+                    chatDisplay.removeChild(chatDisplay.lastChild);
+                }
+
+                // セッションのタイトルが空になったらリセット
+                if (truncatedMessages.length === 0) {
+                    const session = sessions.find(s => s.id === currentSessionId);
+                    if (session) {
+                        session.title = '新しいチャット';
+                        sessionTitle.innerText = session.title;
+                        saveSessions();
+                        renderSessionList();
+                    }
+                }
+            }
+        };
+
+        // 入力欄の自動伸長
+        userInput.addEventListener('input', function() {
+            this.style.height = 'auto';
+            const newHeight = this.scrollHeight;
+            this.style.height = newHeight + 'px';
+            if (newHeight >= 100) {
+                this.style.overflowY = 'auto';
+            } else {
+                this.style.overflowY = 'hidden';
+            }
+        });
+
+        // タイトル編集
+        sessionTitle.addEventListener('blur', () => {
+            if (currentSessionId) {
+                const session = sessions.find(s => s.id === currentSessionId);
+                if (session) {
+                    session.title = sessionTitle.innerText;
+                    saveSessions();
+                    renderSessionList();
+                }
+            }
+        });
+        
+        // --- データ管理（エクスポート・復元） ---
+        const setExportBtn = document.getElementById('setExportBtn');
+        const setImportBtn = document.getElementById('setImportBtn');
+        const importInput = document.getElementById('importInput');
+
+        setExportBtn.onclick = () => {
+            const data = {};
+            for (let i = 0; i < localStorage.length; i++) {
+                const key = localStorage.key(i);
+                if (key.startsWith('gemini_api_key_') || 
+                    key.startsWith('bg_') || 
+                    key.startsWith('character_prompt_') || 
+                    key.startsWith('msgs_') || 
+                    key === 'chat_sessions' || 
+                    key === 'current_session_id') {
+                    data[key] = localStorage.getItem(key);
+                }
+            }
+            const blob = new Blob([JSON.stringify(data)], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            const now = new Date();
+            const dateStr = now.toISOString().split('T')[0];
+            a.href = url;
+            a.download = `ai-chat-data-${dateStr}.json`;
+            a.click();
+            URL.revokeObjectURL(url);
+        };
+
+        setImportBtn.onclick = () => importInput.click();
+
+        importInput.addEventListener('change', (e) => {
+            const file = e.target.files[0];
+            if (!file) return;
+
+            const reader = new FileReader();
+            reader.onload = (event) => {
+                try {
+                    const data = JSON.parse(event.target.result);
+                    if (confirm('データを復元しますか？現在のデータは上書きされます。')) {
+                        // 一旦クリア（任意だが衝突を避けるなら推奨）
+                        // localStorage.clear(); 
+                        Object.keys(data).forEach(key => {
+                            localStorage.setItem(key, data[key]);
+                        });
+                        alert('復元が完了しました。ページを再読み込みします。');
+                        location.reload();
+                    }
+                } catch (err) {
+                    alert('ファイルの読み込みに失敗しました。正しいJSONファイルか確認してください。');
+                }
+            };
+            reader.readAsText(file);
+        });
+
+        // 初期化
+        if (currentSessionId && sessions.some(s => s.id === currentSessionId)) {
+            loadSession(currentSessionId);
+        } else if (sessions.length > 0) {
+            loadSession(sessions[0].id);
+        } else {
+            createNewSession('rabiBtn');
+        }
+
+        // サービスワーカーの登録
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('./sw.js')
+                    .then(reg => console.log('Service Worker registered', reg))
+                    .catch(err => console.error('Service Worker registry failed', err));
+            });
+        }
+    </script>
+</body>
+</html>

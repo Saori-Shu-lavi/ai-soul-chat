@@ -1,0 +1,817 @@
+/* 基本のリセット */
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    background-color: #000000;
+    color: #ffffff;
+    font-family: 'Helvetica Neue', Arial, sans-serif;
+    height: 100vh;
+    overflow: hidden;
+}
+
+/* スクロールバーを非表示にする（機能は維持） */
+*::-webkit-scrollbar {
+    display: none;
+}
+* {
+    -ms-overflow-style: none; /* IE, Edge */
+    scrollbar-width: none; /* Firefox */
+}
+
+/* アプリ全体のコンテナ */
+.app-container {
+    display: flex;
+    flex-direction: column;
+    height: 100vh;
+    max-width: 600px;
+    margin: 0 auto;
+    border: 1px solid #333;
+}
+
+/* トップバー（タイトルとキャラ切替） */
+/* トップバー（タイトルとキャラ切替） */
+.top-bar {
+    position: relative;
+    background-color: #000;
+    border-bottom: 1px solid #222;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 8px 15px;
+    z-index: 5;
+}
+
+.session-title-container {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    z-index: 10;
+}
+
+.session-title {
+    color: #888;
+    padding: 4px 10px;
+    font-size: 0.75rem;
+    min-width: 100px;
+    text-align: center;
+    outline: none;
+    cursor: text;
+    white-space: nowrap;
+    position: relative;
+}
+
+.session-title:focus {
+    color: #fff;
+}
+
+/* メニューボタン（ドア） */
+.menu-btn {
+    background: transparent;
+    border: none;
+    font-size: 1.2rem;
+    cursor: pointer;
+    color: #ccc;
+    width: 32px;
+    height: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    transition: background-color 0.2s;
+    z-index: 20;
+}
+
+.menu-btn:active {
+    background-color: #222;
+}
+
+.top-left-btns {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    z-index: 20;
+}
+
+.top-new-session-btn {
+    background: transparent;
+    border: none;
+    font-size: 1.2rem;
+    cursor: pointer;
+    color: #888;
+    width: 32px;
+    height: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    transition: all 0.2s;
+}
+
+.top-new-session-btn:hover {
+    color: #fff;
+    background-color: #1a1a1a;
+}
+
+.top-new-session-btn:active {
+    background-color: #222;
+}
+
+/* サイドバー */
+.sidebar {
+    position: absolute;
+    top: 0;
+    left: -240px;
+    width: 240px;
+    height: 100%;
+    background-color: #0d0d0d;
+    z-index: 100;
+    transition: left 0.3s ease;
+    border-right: 1px solid #222;
+    display: flex;
+    flex-direction: column;
+}
+
+.sidebar.open {
+    left: 0;
+}
+
+.sidebar-header {
+    padding: 20px 15px;
+    border-bottom: 1px solid #222;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.new-session-btn {
+    background: transparent;
+    border: 1px solid #444;
+    color: #888;
+    width: 24px;
+    height: 24px;
+    border-radius: 4px;
+    font-size: 16px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.new-session-btn:hover {
+    background: #222;
+    color: #fff;
+    border-color: #666;
+}
+
+.sidebar-header h3 {
+    font-size: 10px;
+    color: #666;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+.session-list {
+    list-style: none;
+    padding: 10px;
+    flex: 1;
+    overflow-y: auto;
+}
+
+.session-item {
+    display: flex;
+    align-items: center;
+    padding: 12px 15px;
+    margin-bottom: 4px;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 10.5px;
+    color: #ccc;
+    transition: all 0.2s;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.session-item .dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    margin-right: 10px;
+    flex-shrink: 0;
+}
+
+.session-item.rabi .dot { background-color: #9BBEB2; }
+.session-item.shu .dot { background-color: #956DAF; }
+.session-item.hikaru .dot { background-color: #FFEF6C; }
+
+.session-item:hover {
+    background-color: #1a1a1a;
+    color: #fff;
+}
+
+.session-item.active {
+    background-color: #222;
+    color: #fff;
+    border-left: 2px solid #555;
+}
+
+.session-name {
+    flex: 1;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.delete-session-btn {
+    background: transparent;
+    border: none;
+    color: #444;
+    font-size: 14px;
+    cursor: pointer;
+    margin-left: 8px;
+    opacity: 0;
+    transition: all 0.2s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 2px;
+}
+
+.session-item:hover .delete-session-btn {
+    opacity: 1;
+}
+
+.delete-session-btn:hover {
+    color: #ff6b6b;
+}
+
+.sidebar-footer {
+    padding: 15px;
+    border-top: 1px solid #222;
+}
+
+.settings-btn {
+    width: 100%;
+    background-color: #1a1a1a;
+    border: 1px solid #333;
+    color: #888;
+    padding: 10px;
+    border-radius: 8px;
+    font-size: 10px;
+    cursor: pointer;
+    transition: all 0.2s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+}
+
+.settings-btn:hover {
+    background-color: #222;
+    color: #fff;
+    border-color: #444;
+}
+
+.settings-title {
+    font-size: 10px;
+    color: #666;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    margin-bottom: 12px;
+}
+
+.bg-btn {
+    width: 100%;
+    background-color: #1a1a1a;
+    border: 1px solid #333;
+    color: #ccc;
+    padding: 8px;
+    font-size: 10px;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.bg-btn:hover {
+    background-color: #222;
+    color: #fff;
+}
+
+/* API設定（モーダル内） */
+.modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: #000;
+    z-index: 1000;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.3s ease;
+    padding: 20px;
+    box-sizing: border-box;
+}
+
+.modal.visible {
+    opacity: 1;
+    pointer-events: auto;
+}
+
+.modal-content {
+    width: 100%;
+    max-width: 320px;
+    max-height: 90vh;
+    background-color: #0d0d0d;
+    border: 1px solid #222;
+    border-radius: 12px;
+    padding: 20px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.8);
+    overflow-y: auto;
+    position: relative;
+    box-sizing: border-box;
+}
+
+/* スクロールバー非表示（モーダル内もスッキリさせる） */
+.modal-content::-webkit-scrollbar {
+    display: none;
+}
+.modal-content {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+}
+
+.modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 25px;
+}
+
+.modal-header h2 {
+    font-size: 11px;
+    color: #fff;
+    letter-spacing: 1px;
+}
+
+.close-btn {
+    background: transparent;
+    border: none;
+    color: #666;
+    font-size: 20px;
+    cursor: pointer;
+}
+
+.api-field {
+    margin-bottom: 20px;
+}
+
+.api-field label {
+    display: block;
+    font-size: 10px;
+    color: #666;
+    margin-bottom: 8px;
+    margin-left: 2px;
+}
+
+.api-field input {
+    width: 100%;
+    background-color: #1a1a1a;
+    border: 1px solid #333;
+    color: #fff;
+    padding: 10px 12px;
+    font-size: 10px;
+    border-radius: 6px;
+    outline: none;
+    box-sizing: border-box;
+}
+
+.save-all-btn {
+    width: 100%;
+    background-color: #ffffff;
+    color: #000;
+    border: none;
+    padding: 12px;
+    font-size: 11px;
+    font-weight: bold;
+    border-radius: 6px;
+    cursor: pointer;
+    margin-top: 10px;
+    transition: background-color 0.2s;
+}
+
+.save-all-btn:active {
+    background-color: #ccc;
+}
+
+/* 統合設定モーダルのスタイル */
+.settings-modal-content {
+    max-width: 420px;
+}
+
+.settings-section {
+    margin-bottom: 25px;
+    background-color: #1a1a1a;
+    padding: 15px;
+    border-radius: 12px;
+}
+
+.settings-section-title {
+    font-size: 11px;
+    color: #fff;
+    font-weight: bold;
+    margin-bottom: 12px;
+    border-left: 2px solid #555;
+    padding-left: 8px;
+}
+
+.settings-action-btn {
+    width: 100%;
+    background-color: #222;
+    border: 1px solid #333;
+    color: #e0e0e0;
+    padding: 10px;
+    border-radius: 8px;
+    font-size: 10px;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.settings-action-btn:hover {
+    background-color: #333;
+    color: #fff;
+}
+
+.settings-btn-group {
+    display: flex;
+    gap: 8px;
+}
+
+.settings-action-btn.half {
+    flex: 1;
+}
+
+.settings-save-btn {
+    width: 100%;
+    background-color: #e0e0e0;
+    color: #000;
+    border: none;
+    padding: 10px;
+    border-radius: 8px;
+    font-size: 10px;
+    font-weight: bold;
+    cursor: pointer;
+    margin-top: 8px;
+}
+
+.settings-note {
+    font-size: 9px;
+    color: #666;
+    margin-top: 10px;
+    line-height: 1.4;
+}
+
+.settings-footer {
+    border-top: 1px solid #333;
+    padding-top: 20px;
+}
+
+.settings-back-btn {
+    width: 100%;
+    background-color: transparent;
+    border: 1px solid #333;
+    color: #888;
+    padding: 12px;
+    border-radius: 8px;
+    font-size: 10px;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.settings-back-btn:hover {
+    color: #fff;
+    border-color: #555;
+    background-color: #1a1a1a;
+}
+
+/* 魂格納庫特有のスタイル */
+.soul-modal-content {
+    max-width: 400px;
+}
+
+.soul-tabs {
+    display: flex;
+    gap: 5px;
+    margin-bottom: 20px;
+    background-color: #1a1a1a;
+    padding: 4px;
+    border-radius: 8px;
+}
+
+.soul-tab-btn {
+    flex: 1;
+    background: transparent;
+    border: none;
+    color: #666;
+    font-size: 10px;
+    padding: 8px 0;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.soul-tab-btn.active {
+    background-color: #333;
+    color: #fff;
+}
+
+.prompt-field textarea {
+    width: 100%;
+    height: 150px;
+    background-color: #161616;
+    border: 1px solid #333;
+    color: #fff;
+    padding: 12px;
+    font-size: 10px;
+    border-radius: 8px;
+    outline: none;
+    resize: none;
+    font-family: inherit;
+    line-height: 1.5;
+}
+
+.prompt-field label {
+    display: block;
+    font-size: 10px;
+    color: #666;
+    margin-bottom: 10px;
+    text-align: center;
+}
+
+/* オーバーレイ */
+.overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.7);
+    z-index: 90;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.3s ease;
+}
+
+.overlay.visible {
+    opacity: 1;
+    pointer-events: auto;
+}
+
+/* キャラクター切り替えボタン */
+.character-selector {
+    display: flex;
+    justify-content: flex-end;
+    gap: 8px;
+    z-index: 20;
+}
+
+.char-btn {
+    background: transparent;
+    border: 1px solid #333;
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+#rabiBtn.active {
+    background-color: #9BBEB2;
+    border-color: #9BBEB2;
+}
+
+#shuBtn.active {
+    background-color: #956DAF;
+    border-color: #956DAF;
+}
+
+.char-btn.active {
+    background-color: #ffffff;
+    color: #000000;
+    border-color: #ffffff;
+}
+
+#hikaruBtn.active {
+    background-color: #FFEF6C;
+    border-color: #FFEF6C;
+}
+
+/* チャット表示エリア */
+.chat-display {
+    flex: 1;
+    overflow-y: auto;
+    padding: 15px;
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    background-size: cover;
+    background-position: center;
+    position: relative;
+}
+
+.chat-display.has-bg::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.4); /* 背景画像の視認性を上げるためのオーバーレイ */
+    z-index: 0;
+}
+
+.message {
+    max-width: 80%;
+    padding: 10px 15px;
+    border-radius: 18px;
+    line-height: 1.4;
+    font-size: 10px;
+    z-index: 1; /* メッセージを背景より上にする */
+    word-break: break-word;
+}
+
+/* ユーザー/解説メッセージは改行をそのまま維持 */
+.message.user, .message.system {
+    white-space: pre-wrap;
+}
+
+.message.system {
+    align-self: center;
+    background-color: #222;
+    color: #aaa;
+    font-size: 0.8rem;
+    text-align: center;
+}
+
+.message.user {
+    align-self: flex-end;
+    background-color: #333333;
+    color: #ffffff;
+    border-bottom-right-radius: 2px;
+    padding-right: 35px; /* 編集ボタン用の余白 */
+    position: relative;
+}
+
+.edit-msg-btn {
+    position: absolute;
+    right: 8px;
+    bottom: 8px;
+    background: transparent;
+    border: none;
+    color: #666;
+    font-size: 10px;
+    cursor: pointer;
+    opacity: 0;
+    transition: opacity 0.2s, color 0.2s;
+    padding: 4px;
+}
+
+.message.user:hover .edit-msg-btn {
+    opacity: 1;
+}
+
+.edit-msg-btn:hover {
+    color: #fff;
+}
+
+.message.ai {
+    align-self: flex-start;
+    background-color: #1a1a1a;
+    color: #e0e0e0;
+    border-bottom-left-radius: 2px;
+    border: 1px solid #333;
+}
+
+/* AIメッセージ内のマークダウン調整 */
+.message.ai h1, .message.ai h2, .message.ai h3 {
+    margin: 10px 0 5px 0;
+    font-size: 11px;
+    color: #fff;
+    font-weight: normal;
+}
+
+.message.ai p {
+    margin-bottom: 8px;
+}
+
+.message.ai p:last-child {
+    margin-bottom: 0;
+}
+
+.message.ai strong {
+    color: #fff;
+    font-weight: bold;
+}
+
+.message.ai hr {
+    border: none;
+    border-top: 1px solid #333;
+    margin: 12px 0;
+}
+
+.message.ai ul, .message.ai ol {
+    margin: 8px 0;
+    padding-left: 18px;
+}
+
+.message.ai li {
+    margin-bottom: 4px;
+}
+
+.message.ai-loading {
+    align-self: flex-start;
+    background-color: transparent;
+    color: #666;
+    font-style: italic;
+    font-size: 0.8rem;
+}
+
+/* 入力エリア */
+.input-area {
+    padding: 15px;
+    display: flex;
+    gap: 10px;
+    border-top: 1px solid #333;
+    background-color: #000;
+}
+
+textarea#userInput {
+    flex: 1;
+    background-color: #1a1a1a;
+    border: 1px solid #333;
+    color: #fff;
+    padding: 6px 15px;
+    border-radius: 20px;
+    outline: none;
+    font-size: 10px;
+    font-family: inherit;
+    resize: none;
+    height: 28px;
+    max-height: 100px;
+    line-height: 1.2;
+    overflow-y: hidden;
+}
+
+#sendBtn {
+    width: 32px;
+    height: 32px;
+    border: none;
+    border-radius: 50%;
+    color: #fff;
+    cursor: pointer;
+    font-size: 1.1rem;
+    font-weight: bold;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    transition: all 0.2s;
+}
+
+/* テーマごとの送信ボタンの色 */
+.rabi-theme #sendBtn {
+    background-color: #9BBEB2;
+}
+
+.shu-theme #sendBtn {
+    background-color: #956DAF;
+}
+
+.hikaru-theme #sendBtn {
+    background-color: #FFEF6C;
+}
+
+#sendBtn:active {
+    opacity: 0.7;
+}
+
+/* スマホ向けの微調整 */
+@media (max-width: 480px) {
+    .app-container {
+        border: none;
+    }
+
+    .char-btn {
+        padding: 5px 12px;
+        font-size: 0.8rem;
+    }
+}
