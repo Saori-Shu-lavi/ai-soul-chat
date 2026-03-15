@@ -214,7 +214,7 @@ body {
 }
 
 .session-item.rabi .dot { background-color: #88a476; }
-.session-item.shu .dot { background-color: #9B7FB6; }
+.session-item.shu .dot { background-color: #7E6A8E; }
 .session-item.hikaru .dot { background-color: #FFEF6C; }
 
 .session-item:hover {
@@ -611,8 +611,8 @@ body {
 }
 
 #shuBtn.active {
-    background-color: #9B7FB6;
-    border-color: #9B7FB6;
+    background-color: #7E6A8E;
+    border-color: #7E6A8E;
 }
 
 .char-btn.active {
@@ -812,7 +812,7 @@ textarea#userInput:focus {
 }
 
 .shu-theme #sendBtn {
-    background-color: #9B7FB6;
+    background-color: #7E6A8E;
 }
 
 .hikaru-theme #sendBtn {
