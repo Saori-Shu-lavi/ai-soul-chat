@@ -1,4 +1,4 @@
-const CACHE_NAME = 'ai-chat-v1';
+const CACHE_NAME = 'ai-chat-v2';
 const ASSETS = [
   './',
   './index.html',
