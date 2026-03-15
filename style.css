@@ -47,6 +47,7 @@ body {
     box-sizing: border-box;
     background-color: inherit; /* コンテナの背景色を継承 */
     background-color: #000;
+    justify-content: space-between;
     position: sticky;
     top: 0;
 }
