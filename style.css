@@ -213,8 +213,8 @@ body {
     flex-shrink: 0;
 }
 
-.session-item.rabi .dot { background-color: #9BBEB2; }
-.session-item.shu .dot { background-color: #956DAF; }
+.session-item.rabi .dot { background-color: #88a476; }
+.session-item.shu .dot { background-color: #9B7FB6; }
 .session-item.hikaru .dot { background-color: #FFEF6C; }
 
 .session-item:hover {
@@ -594,21 +594,25 @@ body {
 .char-btn {
     background: transparent;
     border: 1px solid #333;
-    width: 20px;
-    height: 20px;
+    width: 22px;
+    height: 22px;
+    min-width: 22px;
+    min-height: 22px;
+    padding: 0;
     border-radius: 50%;
     cursor: pointer;
     transition: all 0.2s;
+    aspect-ratio: 1 / 1;
 }
 
 #rabiBtn.active {
-    background-color: #9BBEB2;
-    border-color: #9BBEB2;
+    background-color: #88a476;
+    border-color: #88a476;
 }
 
 #shuBtn.active {
-    background-color: #956DAF;
-    border-color: #956DAF;
+    background-color: #9B7FB6;
+    border-color: #9B7FB6;
 }
 
 .char-btn.active {
@@ -804,11 +808,11 @@ textarea#userInput:focus {
 
 /* テーマごとの送信ボタンの色 */
 .rabi-theme #sendBtn {
-    background-color: #9BBEB2;
+    background-color: #88a476;
 }
 
 .shu-theme #sendBtn {
-    background-color: #956DAF;
+    background-color: #9B7FB6;
 }
 
 .hikaru-theme #sendBtn {
@@ -826,7 +830,10 @@ textarea#userInput:focus {
     }
 
     .char-btn {
-        padding: 5px 12px;
-        font-size: 0.8rem;
+        width: 22px;
+        height: 22px;
+        min-width: 22px;
+        min-height: 22px;
+        padding: 0;
     }
 }
